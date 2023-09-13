@@ -21,15 +21,59 @@ const SignUpScreen = () => {
   const [username, setUserName] = '';
   const [email, setEmail] = '';
   const [passwoed, setPassword] = '';
-  const [confirmPasswoed, setconfirmPasswoed] = '';
+  const [confirmPassword, setconfirmPassword] = '';
+
+
+
+ 
+  const [user, setUser] = useState({
+    name:'',
+    email: '',
+    password: '',
+    confirmPassword:''
+    
+
+  });
+
+  const handleInput = (name, value) => {
+    setUser({ ...user, [name]: value });
+  };
+
 
 
   const navigation = useNavigation();
 
+
+ 
+
+
   const onSignUpPressed = () => {
 
-    navigation.navigate("Home")
-    console.warn('hiii');
+    fetch('http://192.168.8.135:2000/api/v1/customers/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((errorInfo) => Promise.reject(errorInfo));
+        }
+        return response.json();
+      })
+      .then((result) => {
+        console.warn(result);
+        if (result.state === 'success') {
+          console.warn('You are logged in.');
+          navigation.navigate('Home');
+        } else {
+          alert('Please check your login information.');
+        }
+      })
+      .catch((error) => {
+        console.warn('Fetch error:', error.message);
+      });
   };
   
   
@@ -57,20 +101,29 @@ const SignUpScreen = () => {
         <CustomInput
           placeholder="UserName"
           value={username}
-          setValue={setUserName}
+          name="name"
+          setValue={(value) => handleInput('name', value)}
+
         />
-        <CustomInput placeholder="Email" value={email} setValue={setEmail} />
+        <CustomInput placeholder="Email" 
+        value={email}  
+        name="email"   
+          setValue={(value) => handleInput('email', value)}/>
         <CustomInput
           placeholder="password"
           value={passwoed}
-          setValue={setPassword}
+          name="password"    
+           setValue={(value) => handleInput('password', value)}
           secureTextEntry
         />
         <CustomInput
           placeholder="Confirm  Password"
-          value={confirmPasswoed}
-          setValue={setconfirmPasswoed}
+          value={confirmPassword}
+        
           secureTextEntry
+
+          name="confirmPassword"    
+          setValue={(value) => handleInput('confirmPassword', value)}
         />
         <CustomButton label="Sign Up" onPress={onSignUpPressed} />
         <Text style={Styles.text}>
