@@ -12,6 +12,8 @@ import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import SocialSignInButtons from '../components/SocialSignInButtons';
 import { useNavigation } from '@react-navigation/native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 const SignInScreen = () => {
@@ -46,7 +48,8 @@ const SignInScreen = () => {
         return response.json();
       })
       .then((result) => {
-        console.warn(result);
+        // console.warn(result);
+        AsyncStorage.setItem('userData', JSON.stringify(result))
         if (result.status === 'success') {
           console.warn('You are logged in.');
           navigation.navigate('Home');
