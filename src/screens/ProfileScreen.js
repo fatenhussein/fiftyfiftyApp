@@ -40,7 +40,7 @@ function ProfileScreen() {
       .then(data => {
         // Save the user's information to state
         setUserData(data.customer);
-        console.warn(data.customer);
+        // console.warn(data.customer);
       })
       .catch(error => {
         console.warn('Error fetching user from API:', error);

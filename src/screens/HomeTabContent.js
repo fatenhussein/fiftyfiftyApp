@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const offersImg = require('../assets/images/offersHome.png');
 const homeIconsData = [
   { icon: require('../assets/images/fuel.png'), label: 'Fuel' },
@@ -18,6 +19,40 @@ const HomeTabContent = () => {
     primary: '#FF5A46', // orange
     secondary: '#CDCDD2',
     white: '#fff', // gray
+  };
+
+  const [userData, setUserData] = useState([]);
+
+
+  useEffect(() => {
+    // Fetch user data from local storage
+    AsyncStorage.getItem('userData')
+      .then((data) => {
+        const storedData = JSON.parse(data);
+        if (storedData && storedData.id) {
+          // If the ID exists, fetch user data from the API
+          return fetchUserFromAPI(storedData.id);
+        }
+      })
+      .catch((error) => {
+        console.warn('Failed to fetch user data from local storage:', error);
+      });
+  }, []);
+
+  const fetchUserFromAPI = (userId) => {
+    // Define your API endpoint and replace with the below URL
+    const apiUrl = `http://192.168.8.135:2000/api/v1/customers/${userId}`;
+
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        // Save the user's information to state
+        setUserData(data.customer);
+        // console.warn(data.customer);
+      })
+      .catch(error => {
+        console.warn('Error fetching user from API:', error);
+      });
   };
   const renderIconImages = () => {
     return homeIconsData.map((data, index) => (
@@ -66,8 +101,8 @@ const HomeTabContent = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Hi, Jenny Wilson</Text>
-          <Text style={styles.subGreeting}>Here is your activity today!</Text>
+          <Text style={styles.greeting}>Hi, {userData.name}</Text>
+          <Text style={styles.subGreeting}> Fuel delivered to your door. Order now!</Text>
         </View>
         <Image source={offersImg} style={styles.offersImage} />
       </View>
@@ -77,7 +112,7 @@ const HomeTabContent = () => {
         style={styles.centerImage}
       /> */}
 
-      <View style={styles.subjectsContainer}>
+      <View style={styles.servicesContainer}>
         <View style={styles.iconsContainer}>{renderIconImages()}</View>
       </View>
     </SafeAreaView>
@@ -100,7 +135,7 @@ const styles = StyleSheet.create({
   },
   subGreeting: {
     color: 'gray',
-    fontSize: 24,
+    fontSize: 18,
     marginTop: 8,
   },
   offersImage: {

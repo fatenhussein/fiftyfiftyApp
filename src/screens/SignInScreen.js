@@ -14,7 +14,6 @@ import SocialSignInButtons from '../components/SocialSignInButtons';
 import { useNavigation } from '@react-navigation/native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 
 const SignInScreen = () => {
   const { height } = useWindowDimensions();
@@ -26,14 +25,32 @@ const SignInScreen = () => {
     email: '',
     password: '',
   });
+  const isValidEmail = (email) => {
+    // A simple regex for email validation
+    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+    return emailRegex.test(email);
+  };
+
+  const isValidPassword = (password) => {
+    // Check if the password length is greater than or equal to 6
+    return password.length >= 6;
+  };
 
   const handleInput = (name, value) => {
     setUser({ ...user, [name]: value });
   };
 
   const onSignInPressed = () => {
-    console.warn(user);
+    //console.warn(user);
+    if (!isValidEmail(user.email)) {
+      alert('Please enter a valid email.');
+      return;
+    }
 
+    if (!isValidPassword(user.password)) {
+      alert('Password should be at least 6 characters.');
+      return;
+    }
     fetch('http://192.168.8.135:2000/api/v1/customers/signIn', {
       method: 'POST',
       headers: {
@@ -49,16 +66,17 @@ const SignInScreen = () => {
       })
       .then((result) => {
         // console.warn(result);
-        AsyncStorage.setItem('userData', JSON.stringify(result))
+        AsyncStorage.setItem('userData', JSON.stringify(result));
         if (result.status === 'success') {
-          console.warn('You are logged in.');
+          //console.warn('You are logged in.');
           navigation.navigate('Home');
         } else {
           alert('Please check your login information.');
         }
       })
       .catch((error) => {
-        console.warn('Fetch error:', error);
+        console.log('Fetch error:', error);
+        alert('Please check your login information.');
       });
   };
 
@@ -68,7 +86,6 @@ const SignInScreen = () => {
 
   const onSignUpPressed = () => {
     navigation.navigate('SignUp');
-    console.warn('hiii');
   };
 
   return (
@@ -102,7 +119,7 @@ const SignInScreen = () => {
         <SocialSignInButtons />
 
         <CustomButton
-          label="Do you have an account ?"
+          label="Don't have an account ?"
           onPress={onSignUpPressed}
           type="tertiary"
         />
