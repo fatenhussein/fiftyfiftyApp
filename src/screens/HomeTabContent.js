@@ -112,7 +112,7 @@ const HomeTabContent = () => {
         style={styles.centerImage}
       /> */}
 
-      <View style={styles.servicesContainer}>
+      <View style={styles.subjectsContainer}>
         <View style={styles.iconsContainer}>{renderIconImages()}</View>
       </View>
     </SafeAreaView>
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   },
   subGreeting: {
     color: 'gray',
-    fontSize: 18,
+    fontSize: 24,
     marginTop: 8,
   },
   offersImage: {
